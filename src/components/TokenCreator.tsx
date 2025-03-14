@@ -1,0 +1,264 @@
+import React, { useState, useEffect } from "react";
+import { GradientButton } from "./ui/gradient-button";
+import TokenConfigForm from "./TokenConfigForm";
+import FeeCalculator from "./FeeCalculator";
+import DeploymentStatus from "./DeploymentStatus";
+import { GlassCard } from "./ui/glass-card";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { createSplToken } from "@/lib/solana";
+import { TokenMetadata } from "@/types/token";
+import { DeploymentStatus as DeploymentStatusType } from "@/types/token";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Separator } from "./ui/separator";
+
+const TokenCreator: React.FC = () => {
+  const { publicKey, signTransaction, connected, wallet } = useWallet();
+  const [tokenConfig, setTokenConfig] = useState<TokenMetadata>({
+    name: "My Meme Coin",
+    symbol: "MEME",
+    supply: "1000000000",
+    description: "A fun meme coin on Solana blockchain",
+    image: null,
+    freezeAuthority: false,
+    mintAuthority: false,
+    updateAuthority: false,
+    modifyCreator: false,
+    creatorName: "CoinFast",
+    creatorWebsite: "https://coinfast.fun",
+  });
+
+  const [deploymentStatus, setDeploymentStatus] =
+    useState<DeploymentStatusType>({
+      status: "idle",
+      progress: 0,
+      tokenName: tokenConfig.name,
+      tokenSymbol: tokenConfig.symbol,
+    });
+
+  const [activeTab, setActiveTab] = useState("configure");
+
+  useEffect(() => {
+    // When deployment is successful, switch to the deploy tab
+    if (deploymentStatus.status === "success") {
+      setActiveTab("deploy");
+    }
+  }, [deploymentStatus.status]);
+
+  const handleConfigChange = (config: TokenMetadata) => {
+    setTokenConfig(config);
+    if (deploymentStatus.status === "idle") {
+      setDeploymentStatus({
+        ...deploymentStatus,
+        tokenName: config.name,
+        tokenSymbol: config.symbol,
+      });
+    }
+  };
+
+  const handleDeployToken = async () => {
+    if (!connected || !publicKey || !wallet) {
+      console.error("Wallet not connected properly");
+      return;
+    }
+
+    console.log("Starting token deployment with wallet:", wallet);
+
+    // Start deployment process
+    setDeploymentStatus({
+      status: "deploying",
+      progress: 0,
+      tokenName: tokenConfig.name,
+      tokenSymbol: tokenConfig.symbol,
+    });
+
+    try {
+      // Progress simulation for UX
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 5;
+        if (progress <= 90) {
+          setDeploymentStatus((prev) => ({
+            ...prev,
+            progress,
+          }));
+        }
+      }, 300);
+
+      // Actual token creation
+      console.log("Attempting to create token with config:", tokenConfig);
+      const tokenAddress = await createSplToken(wallet.adapter, tokenConfig);
+      console.log("Token created successfully with address:", tokenAddress);
+
+      // Complete the progress and show success
+      clearInterval(interval);
+      setDeploymentStatus({
+        status: "success",
+        progress: 100,
+        tokenName: tokenConfig.name,
+        tokenSymbol: tokenConfig.symbol,
+        tokenAddress,
+      });
+    } catch (error) {
+      console.error("Token deployment failed:", error);
+      setDeploymentStatus({
+        status: "error",
+        tokenName: tokenConfig.name,
+        tokenSymbol: tokenConfig.symbol,
+        errorMessage:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
+    }
+  };
+
+  const handleRetry = () => {
+    setDeploymentStatus({
+      status: "idle",
+      tokenName: tokenConfig.name,
+      tokenSymbol: tokenConfig.symbol,
+    });
+    setActiveTab("configure");
+  };
+
+  const handleCreateAnother = () => {
+    // Reset form and status
+    setTokenConfig({
+      name: "My Meme Coin",
+      symbol: "MEME",
+      supply: "1000000000",
+      description: "A fun meme coin on Solana blockchain",
+      image: null,
+      freezeAuthority: false,
+      mintAuthority: false,
+      updateAuthority: false,
+      modifyCreator: false,
+      creatorName: "CoinFast",
+      creatorWebsite: "https://coinfast.fun",
+    });
+    setDeploymentStatus({
+      status: "idle",
+      progress: 0,
+    });
+    setActiveTab("configure");
+  };
+
+  if (!connected) {
+    return (
+      <GlassCard className="w-full max-w-3xl mx-auto p-8 text-center mt-12">
+        <h2 className="text-2xl font-bold mb-4 text-white">
+          Create Your Meme Coin
+        </h2>
+        <p className="mb-6 text-gray-300">
+          Connect your Solana wallet to start creating your custom meme coin.
+        </p>
+        <GradientButton
+          variant="solana"
+          size="lg"
+          onClick={() =>
+            document.querySelector(".wallet-adapter-button")?.click()
+          }
+        >
+          Connect Wallet
+        </GradientButton>
+      </GlassCard>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-5xl mx-auto p-4 mt-8">
+      <div className="mb-10 text-center">
+        <h1 className="text-4xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-fuchsia-500">
+          Create Your Meme Coin
+        </h1>
+        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          Design and deploy your custom meme coin on the Solana blockchain
+        </p>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-8 bg-background/20 backdrop-blur-sm">
+          <TabsTrigger
+            value="configure"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-fuchsia-500 data-[state=active]:text-white"
+          >
+            Configure Token
+          </TabsTrigger>
+          <TabsTrigger
+            value="deploy"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-fuchsia-500 data-[state=active]:text-white"
+            disabled={
+              deploymentStatus.status !== "success" &&
+              deploymentStatus.status !== "error"
+            }
+          >
+            Deployment Status
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="configure" className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <TokenConfigForm onConfigChange={handleConfigChange} />
+            </div>
+
+            <div className="space-y-6">
+              <GlassCard>
+                <h3 className="text-xl font-bold mb-4 text-white">
+                  Fee Summary
+                </h3>
+                <FeeCalculator
+                  freezeAuthority={tokenConfig.freezeAuthority}
+                  mintAuthority={tokenConfig.mintAuthority}
+                  updateAuthority={tokenConfig.updateAuthority}
+                  modifyCreator={tokenConfig.modifyCreator}
+                />
+              </GlassCard>
+
+              <GlassCard>
+                <h3 className="text-xl font-bold mb-4 text-white">
+                  Ready to Launch?
+                </h3>
+                <p className="text-gray-300 mb-6">
+                  Review your token configuration and click "Deploy Token" to
+                  create your meme coin on the Solana blockchain.
+                </p>
+                <GradientButton
+                  variant="solana"
+                  size="lg"
+                  className="w-full"
+                  onClick={handleDeployToken}
+                  disabled={
+                    !tokenConfig.name ||
+                    !tokenConfig.symbol ||
+                    !tokenConfig.supply ||
+                    deploymentStatus.status === "deploying"
+                  }
+                >
+                  {deploymentStatus.status === "deploying"
+                    ? "Deploying..."
+                    : "Deploy Token"}
+                </GradientButton>
+              </GlassCard>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="deploy">
+          <GlassCard className="p-8">
+            <DeploymentStatus
+              status={deploymentStatus.status}
+              progress={deploymentStatus.progress}
+              tokenName={deploymentStatus.tokenName}
+              tokenSymbol={deploymentStatus.tokenSymbol}
+              tokenAddress={deploymentStatus.tokenAddress}
+              errorMessage={deploymentStatus.errorMessage}
+              onRetry={handleRetry}
+              onCreateAnother={handleCreateAnother}
+            />
+          </GlassCard>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default TokenCreator;
