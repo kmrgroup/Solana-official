@@ -28,5 +28,8 @@ export interface DeploymentStatus {
   tokenName?: string;
   tokenSymbol?: string;
   tokenAddress?: string;
+  txHash?: string;
+  mintAuthority?: string;
+  freezeAuthority?: string | null;
   errorMessage?: string;
 }

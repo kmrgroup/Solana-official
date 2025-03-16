@@ -1,10 +1,10 @@
 import React from "react";
-import { GradientButton } from "./ui/gradient-button";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { cn } from "@/lib/utils";
 import { Wallet, Coins, Menu, X } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { connection } from "@/lib/solana";
+import { connection } from "@/backend/utils/solanaConnection";
 
 const Header = () => {
   const { publicKey } = useWallet();

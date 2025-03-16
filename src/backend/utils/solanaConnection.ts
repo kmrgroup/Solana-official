@@ -23,21 +23,6 @@ export const connection = new Connection(clusterApiUrl("devnet"), {
   confirmTransactionInitialTimeout: 60000, // 60 seconds timeout
 });
 
-// Create a new SPL token (legacy method)
-export async function createSplToken(
-  wallet: any,
-  metadata: TokenMetadata,
-): Promise<string> {
-  try {
-    // Use the new token creator implementation
-    const result = await createSplTokenContract(connection, wallet, metadata);
-    return result.tokenAddress;
-  } catch (error) {
-    console.error("Error creating token:", error);
-    throw error;
-  }
-}
-
 // Get token balance
 export async function getTokenBalance(
   wallet: any,

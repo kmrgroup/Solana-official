@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { GradientButton } from "./ui/gradient-button";
-import TokenConfigForm from "./TokenConfigForm";
-import FeeCalculator from "./FeeCalculator";
-import DeploymentStatus from "./DeploymentStatus";
-import { GlassCard } from "./ui/glass-card";
+import { GradientButton } from "@/components/ui/gradient-button";
+import TokenConfigForm from "@/components/TokenConfigForm";
+import FeeCalculator from "@/components/FeeCalculator";
+import DeploymentStatus from "@/components/DeploymentStatus";
+import { GlassCard } from "@/components/ui/glass-card";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { TokenMetadata } from "@/types/token";
 import { DeploymentStatus as DeploymentStatusType } from "@/types/token";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Separator } from "./ui/separator";
-import WalletConnectButton from "./WalletConnectButton";
-import WalletConnectionDebug from "./WalletConnectionDebug";
-import {
-  validateTokenMetadata,
-  createSplTokenContract,
-} from "@/lib/tokenCreator";
-import { connection } from "@/lib/solana";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import WalletConnectButton from "@/components/WalletConnectButton";
+import WalletConnectionDebug from "@/components/WalletConnectionDebug";
+import { validateTokenMetadata } from "@/backend/utils/tokenCreator";
+import { createSplTokenContract } from "@/backend/utils/tokenCreator";
+import { connection } from "@/backend/utils/solanaConnection";
 
 const TokenCreator: React.FC = () => {
   const { publicKey, signTransaction, connected, wallet } = useWallet();

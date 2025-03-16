@@ -1,10 +1,10 @@
 import React from "react";
-import Header from "./Header";
-import TokenCreator from "./TokenCreator";
-import { GradientButton } from "./ui/gradient-button";
+import Header from "../components/Header";
+import TokenCreator from "../components/TokenCreator";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { useWallet } from "@solana/wallet-adapter-react";
-import AnimatedGradientBackground from "./ui/animated-gradient-background";
-import { GlassCard } from "./ui/glass-card";
+import AnimatedGradientBackground from "@/components/ui/animated-gradient-background";
+import { GlassCard } from "@/components/ui/glass-card";
 import {
   Zap,
   Shield,

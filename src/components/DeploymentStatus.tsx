@@ -10,6 +10,9 @@ export interface DeploymentStatusProps {
   tokenName?: string;
   tokenSymbol?: string;
   tokenAddress?: string;
+  txHash?: string;
+  mintAuthority?: string;
+  freezeAuthority?: string | null;
   errorMessage?: string;
   onRetry?: () => void;
   onCreateAnother?: () => void;
@@ -21,6 +24,9 @@ const DeploymentStatus = ({
   tokenName = "Sample Token",
   tokenSymbol = "SMPL",
   tokenAddress = "7nVTXkqKPHGW7gxP8mGKA5BNYFzMvxqR9QXbfsYrJcH1",
+  txHash = "5UfDuX1gZWDDhKHpgBvd8kMWXmJxWLBdDTYSfxBiWFGEZe1XGbCVGVDUHKyKpQSVtKz2hU9F6zTBjNKUEMqnUJAP",
+  mintAuthority = "7nVTXkqKPHGW7gxP8mGKA5BNYFzMvxqR9QXbfsYrJcH1",
+  freezeAuthority = null,
   errorMessage = "Transaction failed. Please check your wallet and try again.",
   onRetry = () => {},
   onCreateAnother = () => {},
@@ -80,6 +86,26 @@ const DeploymentStatus = ({
                     >
                       {copied ? "Copied!" : "Copy"}
                     </Button>
+                  </div>
+                  <div>
+                    <span className="font-medium">Mint Authority:</span>
+                    <code className="bg-muted px-2 py-1 rounded text-xs ml-2">
+                      {mintAuthority}
+                    </code>
+                  </div>
+                  {freezeAuthority && (
+                    <div>
+                      <span className="font-medium">Freeze Authority:</span>
+                      <code className="bg-muted px-2 py-1 rounded text-xs ml-2">
+                        {freezeAuthority}
+                      </code>
+                    </div>
+                  )}
+                  <div>
+                    <span className="font-medium">Transaction Hash:</span>
+                    <code className="bg-muted px-2 py-1 rounded text-xs block mt-1 overflow-x-auto">
+                      {txHash}
+                    </code>
                   </div>
                 </div>
               </AlertDescription>
